@@ -1,5 +1,8 @@
 TODO
 
+- Add --exec option for executing a program on connection (borrowed from ncat)
+- Add --keep-alive option remaining open; used in conjunction with exec to
+    fork/exec new processes.  Only applicable in listen mode (borrowed from ncat)
 - Add UDP support (-u)
 - Make command line argument parsing more flexible
     (ie, hostname shouldn't be required all the time)
