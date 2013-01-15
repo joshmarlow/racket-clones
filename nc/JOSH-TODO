@@ -1,0 +1,10 @@
+TODO
+
+- Add UDP support (-u)
+- Make command line argument parsing more flexible
+    (ie, hostname shouldn't be required all the time)
+- Make commandline arguments better mirror nc arguments
+- Add -w (timeout) option
+- Add IPv6 support (-6)
+
+ACCOMPLISHED
