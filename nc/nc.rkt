@@ -27,6 +27,7 @@
     cmd-options))
 
 (define (handle in-1 out-1 in-2 out-2)
+  ; Cross the ports so that the in-1 -> out-2 and in-2 _> out-1
   (define cust (make-custodian))
   (parameterize ([current-custodian cust])
       ; Define a function for reading from one port and writing to another
@@ -47,6 +48,7 @@
       (thread-wait p2)))
 
 (define (launch-as-server host port)
+    ; Launch application in Server mode
     (define listener (tcp-listen port 1 #t))
     (define-values (in out) (tcp-accept listener))
     (handle in out (current-input-port) (current-output-port))
@@ -54,14 +56,19 @@
     (close-output-port out))
 
 (define (launch-as-client host port)
-  (define-values (in out) (tcp-connect host port))
+    ; Launch application in client mode
+    (define-values (in out) (tcp-connect host port))
     (handle in out (current-input-port) (current-output-port))
     (close-input-port in)
     (close-output-port out))
 
-(let ((cmd-options (parse-cmd-options)))
-  (cond
-    ((eq? (hash-ref cmd-options 'mode) 'client)
-     (launch-as-server(hash-ref cmd-options 'host) (hash-ref cmd-options 'port)))
-    ((eq? (hash-ref cmd-options 'mode) 'server)
-     (launch-as-client (hash-ref cmd-options 'host) (hash-ref cmd-options 'port)))))
+(define (main)
+    ; Main application logic
+    (let ((cmd-options (parse-cmd-options)))
+      (cond
+        ((eq? (hash-ref cmd-options 'mode) 'client)
+         (launch-as-server(hash-ref cmd-options 'host) (hash-ref cmd-options 'port)))
+        ((eq? (hash-ref cmd-options 'mode) 'server)
+         (launch-as-client (hash-ref cmd-options 'host) (hash-ref cmd-options 'port))))))
+
+(main)
