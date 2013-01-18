@@ -9,7 +9,7 @@
   (define (make-defaults-ht)
     ; define some default behavior in case we don't get any parameters
     (let ((ht (make-hash)))
-      (and (hash-set! ht 'mode 'server)
+      (and (hash-set! ht 'mode 'client)
            (hash-set! ht 'host "localhost")
            (hash-set! ht 'port 80))
       ht))
@@ -20,7 +20,7 @@
      #:program "nc"
      #:once-each
      [("-l" "--listen") "Run as a server"
-                        (hash-set! cmd-options 'mode `client)]
+                        (hash-set! cmd-options 'mode `server)]
      #:args
      (host port) (and (hash-set! cmd-options 'host host)
                       (hash-set! cmd-options 'port (string->number port))))
@@ -66,9 +66,9 @@
     ; Main application logic
     (let ((cmd-options (parse-cmd-options)))
       (cond
-        ((eq? (hash-ref cmd-options 'mode) 'client)
-         (launch-as-server(hash-ref cmd-options 'host) (hash-ref cmd-options 'port)))
         ((eq? (hash-ref cmd-options 'mode) 'server)
+         (launch-as-server(hash-ref cmd-options 'host) (hash-ref cmd-options 'port)))
+        ((eq? (hash-ref cmd-options 'mode) 'client)
          (launch-as-client (hash-ref cmd-options 'host) (hash-ref cmd-options 'port))))))
 
 (main)
