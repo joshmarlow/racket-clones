@@ -35,10 +35,7 @@
              (subprocess #f #f #f command-path))
            (if subproc
               (and
-                (display (subprocess-status subproc))
-                (display "\n")
                 (echo-handler p-out p-in in-1 out-1)
-                (display "finished copying\n")
                 (close-input-port p-out)
                 (close-output-port p-in))
              (display (string-append "Could not execute command: " command-path))))))
