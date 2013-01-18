@@ -25,7 +25,7 @@
       (thread-wait p1)
       (thread-wait p2)))
 
-(define (sub-process-handler command-name in-1 out-1 in-2 out-2)
+(define (sub-process-handler command-name in-1 out-1 junk-in-2 junk-out-2)
   (let ([command-path (find-executable-path command-name)])
     (if command-path
       (let ((command-path (path->string (find-executable-path command-name))))
