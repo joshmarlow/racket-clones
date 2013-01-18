@@ -12,6 +12,7 @@
       ; Define a function for reading from one port and writing to another
       (define (pipe in out)
         (copy-port in out)
+        (flush-output out)
         (custodian-shutdown-all cust))
 
       ; Spawn pipes for each direction
@@ -23,6 +24,27 @@
       ; Wait on the threads to do their thing
       (thread-wait p1)
       (thread-wait p2)))
+
+(define (sub-process-handler command-name in-1 out-1 in-2 out-2)
+  (let ([command-path (find-executable-path command-name)])
+    (if command-path
+      (let ((command-path (path->string (find-executable-path command-name))))
+       (let ((cust (make-custodian)))
+       (parameterize ([current-custodian cust])
+           (define-values (subproc p-out p-in p-err)
+             (subprocess #f #f #f command-path))
+           (if subproc
+              (and
+                (display (subprocess-status subproc))
+                (display "\n")
+                (echo-handler p-out p-in in-1 out-1)
+                (display "finished copying\n")
+                (close-input-port p-out)
+                (close-output-port p-in))
+             (display (string-append "Could not execute command: " command-path))))))
+      (display
+        (string-append "Could not locate command: " command-name)
+        (current-error-port)))))
 
 (define (parse-cmd-options)
   (define (make-defaults-ht)
@@ -41,6 +63,11 @@
      #:once-each
      [("-l" "--listen") "Run as a server"
                      (hash-set! cmd-options 'mode `server)]
+     [("-e" "--exec") command-name
+                     "Execute a command"
+                     (hash-set! cmd-options 'io-handler
+                        (lambda (in-1 out-1 in-2 out-2)
+                            (sub-process-handler command-name in-1 out-1 in-2 out-2)))]
      [("-p" "--port") port-number
                       "Specify a port explicitly"
                      (hash-set! cmd-options 'port (string->number port-number))]
