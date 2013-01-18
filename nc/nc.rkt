@@ -9,9 +9,9 @@
   (define (make-defaults-ht)
     ; define some default behavior in case we don't get any parameters
     (let ((ht (make-hash)))
-      (and (hash-set! ht 'mode 'client)
-           (hash-set! ht 'host "localhost")
-           (hash-set! ht 'port 80))
+      (hash-set! ht 'mode 'client)
+      (hash-set! ht 'host "localhost")
+      (hash-set! ht 'port 80)
       ht))
 
   ; parse the command line options so the program knows what to do
@@ -22,8 +22,12 @@
      [("-l" "--listen") "Run as a server"
                         (hash-set! cmd-options 'mode `server)]
      #:args
-     (host port) (and (hash-set! cmd-options 'host host)
-                      (hash-set! cmd-options 'port (string->number port))))
+     arg-list (and (if (> (length arg-list) 0)
+                    (hash-set! cmd-options 'host (first arg-list))
+                    null)
+                   (if (> (length arg-list) 1)
+                     (hash-set! cmd-options 'port (first (first arg-list)))
+                     null)))
     cmd-options))
 
 (define (handle in-1 out-1 in-2 out-2)
