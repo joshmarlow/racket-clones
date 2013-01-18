@@ -11,9 +11,7 @@
   (parameterize ([current-custodian cust])
       ; Define a function for reading from one port and writing to another
       (define (pipe in out)
-        (for ([byte in])
-         (write-byte byte out)
-         (flush-output out))
+        (copy-port in out)
         (custodian-shutdown-all cust))
 
       ; Spawn pipes for each direction
