@@ -33,12 +33,15 @@
        (parameterize ([current-custodian cust])
            (define-values (subproc p-out p-in p-err)
              (subprocess #f #f #f command-path))
-           (if subproc
-              (and
-                (echo-handler p-out p-in in-1 out-1)
-                (close-input-port p-out)
-                (close-output-port p-in))
-             (display (string-append "Could not execute command: " command-path))))))
+           ; Merge the subprocess stdout and stderr so that we can send both
+           ; over the network
+           (let ((merged-subproc-output (merge-input p-out p-err)))
+               (if subproc
+                  (and
+                    (echo-handler merged-subproc-output p-in in-1 out-1)
+                    (close-input-port p-out)
+                    (close-output-port p-in))
+                 (display (string-append "Could not execute command: " command-path)))))))
       (display
         (string-append "Could not locate command: " command-name)
         (current-error-port)))))
